@@ -8,8 +8,6 @@
 
 DHT_Unified dht(DHTPIN, DHTTYPE);
 
-uint32_t delayMS;
-
 void setup() {
   // Initialisation du moniteur série et du capteur DHT
   Serial.begin(9600);
@@ -39,14 +37,6 @@ void setup() {
   Serial.print(F("Résolution: ")); Serial.print(sensor.resolution); Serial.println(F("%"));
   Serial.println(F("------------------------------------"));
 
-  // Définir le délai entre les lectures en fonction des caractéristiques du capteur
-  delayMS = sensor.min_delay / 1000;
-}
-
-void loop() {
-  // Délai entre les mesures
-  delay(5000);
-
   // Lire la température
   sensors_event_t event;
   dht.temperature().getEvent(&event);
@@ -67,4 +57,15 @@ void loop() {
     Serial.print(event.relative_humidity);
     Serial.println(F("%"));
   }
+
+  // Configurer un réveil après 5 secondes
+  esp_sleep_enable_timer_wakeup(5000000); // 5 secondes en microsecondes
+  Serial.println(F("Entrée en mode Deep Sleep..."));
+  delay(100);
+  // Passer en mode Deep Sleep
+  esp_deep_sleep_start(); // Entrer en Deep Sleep
+}
+
+void loop() {
+  // La fonction loop est vide car tout se passe dans setup() avec Deep Sleep
 }
